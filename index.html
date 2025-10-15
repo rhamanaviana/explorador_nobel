@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explorador do Prêmio Nobel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <link rel="stylesheet" href="styles.css">
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        setLogLevel('Debug');
+        
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        
+        if (Object.keys(firebaseConfig).length > 0) {
+            const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
+            
+            onAuthStateChanged(auth, async (user) => {
+                if (!user) {
+                    try {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(auth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(auth);
+                        }
+                    } catch (error) {
+                        console.error("Erro na autenticação Firebase:", error);
+                    }
+                }
+            });
+        }
+    </script>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <div class="main-container p-4 sm:p-8 rounded-2xl w-full max-w-4xl space-y-6 sm:space-y-8 backdrop-blur-sm bg-opacity-90">
+        <div class="text-center">
+            <h1 class="text-5xl sm:text-6xl font-extrabold nobel-title tracking-wider drop-shadow-xl">
+                Vencedores do Prêmio Nobel
+            </h1>
+            <p class="text-description mt-2 text-sm sm:text-base">Explore os vencedores do prêmio por nome, ano ou categoria.</p>
+        </div>
+        
+        <div class="flex flex-col gap-4">
+            <input 
+                id="searchInput" 
+                type="text" 
+                placeholder="Pesquisar por nome..." 
+                class="input-field w-full px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-4 transition-all duration-200 shadow-md"
+            >
+            <div class="flex flex-col md:flex-row gap-4">
+                <select
+                    id="yearFilter"
+                    class="filter-field w-full md:w-1/2 px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-4 transition-all duration-200 cursor-pointer"
+                >
+                    <option value="">Todos os Anos</option>
+                </select>
+                <select
+                    id="categoryFilter"
+                    class="filter-field w-full md:w-1/2 px-4 py-3 rounded-lg border-2 focus:outline-none focus:ring-4 transition-all duration-200 cursor-pointer"
+                >
+                    <option value="">Todas as Categorias</option>
+                    <option value="chemistry">Química</option>
+                    <option value="economics">Ciências Econômicas</option>
+                    <option value="literature">Literatura</option>
+                    <option value="peace">Paz</option>
+                    <option value="physics">Física</option>
+                    <option value="medicine">Medicina</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="loadingIndicator" class="hidden flex justify-center items-center py-4">
+            <div class="loader"></div>
+            <span class="ml-2 text-accent font-semibold">A carregar dados...</span>
+        </div>
+        
+        <div id="resultsContainer" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"></div>
+        <div id="statusMessage" class="hidden p-4 rounded-lg text-center font-medium"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
