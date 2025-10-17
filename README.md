@@ -61,4 +61,5 @@ API Nobel Prize → Fonte dos dados sobre os ganhadores de cada ano e categoria.
 
 # 🌐 Acesse o Aplicativo
 
+🔗  **Acesse o aplicativo de música:** [Clique aqui para acessar!](https://nobel-fa4m.onrender.com/)
 
